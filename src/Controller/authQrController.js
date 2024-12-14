@@ -349,7 +349,7 @@ export const generateQrCode = async (req, res) => {
     }
 
     // Generate QR code URL using QRCode.toDataURL()
-    const qrCodeUrl = await QRCode.toDataURL(`http://backend-env.eba-xmbidked.ap-south-1.elasticbeanstalk.com/api/redirect/${qrCodeId}`);
+    const qrCodeUrl = await QRCode.toDataURL(`https://back-cuch.onrender.com/api/redirect/${qrCodeId}`);
 
    
     const newQrCode = new Qr({
@@ -457,6 +457,7 @@ export const redirectQrCode = async (req, res) => {
         }
       }
     }
+
        else {
         console.log("Current time is outside the valid slot time window.");
       }
