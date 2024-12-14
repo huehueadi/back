@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+</head>
+<body>
+  <!-- Page Header -->
+  <header>
+    <h1><%= title %></h1>
+  </header>
+
+  <!-- Page Content -->
+  <main>
+    <% if (content && content.length > 0) { %>
+      <% content.forEach(item => { %>
+        <div class="content-item">
+          <% if (item.type === 'text') { %>
+            <!-- Text Content -->
+            <h2><%= item.textContent.heading %></h2>
+            <p><%= item.textContent.description %></p>
+          <% } else if (item.type === 'image') { %>
+            <!-- Image Content -->
+            <img src="<%= item.imageContent.url %>" alt="<%= item.imageContent.image_description %>" />
+            <p><%= item.imageContent.image_description %></p>
+          <% } else if (item.type === 'link') { %>
+            <!-- Link Content -->
+            <a href="<%= item.linkContent.linkUrl %>" target="_blank">
+              <%= item.linkContent.link_description %>
+            </a>
+          <% } %>
+        </div>
+      <% }) %>
+    <% } else { %>
+      <p>No content available for this page.</p>
+    <% } %>
+  </main>
+
+  <!-- Page Footer -->
+  <footer>
+    <p>Page created with love. Slug: <%= slug %></p>
+  </footer>
+</body>
+</html>

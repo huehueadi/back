@@ -1,0 +1,50 @@
+<!-- views/flowpage.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= flowpage.title %> - Flowpage</title>
+  <!-- Internal CSS -->
+  <style>
+    body {
+      background-color: #f0f0f0;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    h1 {
+      color: #333;
+    }
+    p {
+      color: #555;
+    }
+    a {
+      color: blue;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    img {
+      width: 200px;
+      border-radius: 10px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1><%= flowpage.title %></h1>
+
+  <% flowpage.content.forEach(item => { %>
+    <% if (item.contentType === 'text') { %>
+      <p><%= item.contentData %></p>
+    <% } else if (item.contentType === 'link') { %>
+      <a href="<%= item.contentData %>">Visit Link</a>
+    <% } else if (item.contentType === 'image') { %>
+      <img src="<%= item.contentData %>" alt="Image">
+    <% } %>
+  <% }) %>
+</body>
+</html>
+
