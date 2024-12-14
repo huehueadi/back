@@ -33,7 +33,9 @@
     "qrcode": "^1.5.4",
     "regexp": "^1.0.0",
     "socket.io": "^4.8.1",
-    "uuid": "^11.0.3"
+    "uuid": "^11.0.3",
+    "vcard": "^0.1.0",
+    "vcards-js": "^2.10.0"
   },
   "devDependencies": {
     "eslint": "^8.32.0",

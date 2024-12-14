@@ -1,4 +1,5 @@
 import moment from 'moment';
+import vCardsJs from 'vcards-js';
 import Call from '../Models/CallModel.js';
 import File from '../Models/FileModel.js';
 import Slot from "../Models/SlotModel.js";
@@ -63,20 +64,49 @@ const createRelatedDocuments = async ({ v_card, sms, call, file_upload, req }) =
   const documents = {};
 
   if (v_card) {
-    const { first_name, last_name, email, phone_number, organisation, address, website_url, vCardData, } = req.body;
+    const { 
+      first_name, 
+      last_name, 
+      email, 
+      phone_number, 
+      organisation, 
+      address, 
+      website_url, 
+      vCardData, 
+      birthday, 
+      title, 
+      photo_url, 
+      note 
+    } = req.body;
   
-    // If vCardData is not provided in the request, generate it from the other fields
-    const generatedVCardData = vCardData || `BEGIN:VCARD
-      VERSION:3.0
-      FN:${first_name} ${last_name}
-      TEL:${phone_number}
-      EMAIL:${email}
-      ORG:${organisation}
-      URL:${website_url}
-      ADR:${address}
-      END:VCARD`;
+    // If vCardData is not provided in the request, generate it using vCard.js
+    const generatedVCardData = vCardData || (() => {
+      let newVCard = new vCardsJs();
   
-    // Create a new Vcard document with the provided or generated vCardData
+      // Add the fields to the vCard object
+      newVCard.firstName = first_name;
+      newVCard.lastName = last_name;
+      newVCard.email = email;
+      newVCard.workPhone = phone_number;
+      newVCard.organization = organisation;
+      newVCard.address = address;  // Address field
+  
+      // Optionally add a photo from a URL
+      if (photo_url) {
+        newVCard.photo.attachFromUrl(photo_url, 'JPEG');  // Attach photo if provided
+      }
+  
+      // Set the optional fields
+      newVCard.birthday = birthday ? new Date(birthday) : new Date(1985, 0, 1);  // Default to January 1, 1985 if no birthday
+      newVCard.title = title || 'Software Developer';  // Default title if not provided
+      newVCard.url = website_url;
+      newVCard.note = note || 'Notes on this person';  // Default note
+  
+      // Return the generated vCard string in standard .vcf format
+      return newVCard.toString();
+    })();
+  
+    // Create a new vCard document with the provided or generated vCard data
     const newVcard = new Vcard({
       first_name,
       last_name,
@@ -85,7 +115,11 @@ const createRelatedDocuments = async ({ v_card, sms, call, file_upload, req }) =
       organisation,
       address,
       website_url,
-      vCardData: generatedVCardData,
+      vCardData: generatedVCardData,  // Store the generated vCard data
+      birthday,
+      title,
+      photo_url,
+      note
     });
   
     // Save the vCard and add it to the documents object
