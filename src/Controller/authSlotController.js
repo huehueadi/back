@@ -79,34 +79,42 @@ const createRelatedDocuments = async ({ v_card, sms, call, file_upload, req }) =
       note 
     } = req.body;
   
-    // If vCardData is not provided in the request, generate it using vCard.js
+    if (!first_name || !last_name || !email) {
+      throw new Error("First name, last name, and email are required.");
+    }
+  
     const generatedVCardData = vCardData || (() => {
       let newVCard = new vCardsJs();
-  
-      // Add the fields to the vCard object
       newVCard.firstName = first_name;
       newVCard.lastName = last_name;
       newVCard.email = email;
       newVCard.workPhone = phone_number;
       newVCard.organization = organisation;
-      newVCard.address = address;  // Address field
+      newVCard.address = address;
   
-      // Optionally add a photo from a URL
       if (photo_url) {
-        newVCard.photo.attachFromUrl(photo_url, 'JPEG');  // Attach photo if provided
+        newVCard.photo.attachFromUrl(photo_url, 'JPEG');
       }
   
-      // Set the optional fields
-      newVCard.birthday = birthday ? new Date(birthday) : new Date(1985, 0, 1);  // Default to January 1, 1985 if no birthday
-      newVCard.title = title || 'Software Developer';  // Default title if not provided
+      newVCard.birthday = birthday ? new Date(birthday) : new Date(1985, 0, 1);
+      newVCard.title = title || 'Software Developer';
       newVCard.url = website_url;
-      newVCard.note = note || 'Notes on this person';  // Default note
+      newVCard.note = note || 'Notes on this person';
   
-      // Return the generated vCard string in standard .vcf format
-      return newVCard.toString();
+      const vCardString = newVCard.getFormattedString();
+      console.log(vCardString)
+      if (!vCardString) {
+        console.error("Generated vCard data is empty or invalid.");
+      }
+      return vCardString;
+     
     })();
   
-    // Create a new vCard document with the provided or generated vCard data
+    // Check if vCard data is valid
+    if (!generatedVCardData) {
+      throw new Error("vCard data is invalid or empty.");
+    }
+  
     const newVcard = new Vcard({
       first_name,
       last_name,
@@ -115,18 +123,24 @@ const createRelatedDocuments = async ({ v_card, sms, call, file_upload, req }) =
       organisation,
       address,
       website_url,
-      vCardData: generatedVCardData,  // Store the generated vCard data
+      vCardData: generatedVCardData,
       birthday,
       title,
       photo_url,
       note
     });
   
-    // Save the vCard and add it to the documents object
-    documents.v_card = await newVcard.save();
-    console.log("vCard saved successfully:", documents.v_card);
+    try {
+      const savedVCard = await newVcard.save();
+      if (!savedVCard) {
+        throw new Error("Failed to save vCard.");
+      }
+      documents.v_card = savedVCard;
+      console.log("vCard saved successfully:", documents.v_card);
+    } catch (error) {
+      console.error("Error saving vCard:", error);
+    }
   }
-  
 
   if (sms) {
     const { recipient_number, message } = req.body;

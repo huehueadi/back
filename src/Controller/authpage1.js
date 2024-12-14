@@ -1,3 +1,4 @@
+import Screenshot from "../Models/DefaultPageModel.js";
 import Page1 from "../Models/Page1Model.js";
 
 // export const createpage1 = async(req, res)=>{
@@ -59,11 +60,13 @@ export const getapge1 = async (req, res) => {
     try {
       const {templateId} = req.params 
       const { pageTitle, slug, content } = req.body;
-  
+      
+      const template = await Screenshot.findById(templateId)
+      
       const newPage = new Page1({
         pageTitle,
         slug,
-        templateId,
+        templateId: template.name,
         content,
       });
   
