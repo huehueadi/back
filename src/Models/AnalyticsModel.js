@@ -7,26 +7,23 @@ const analyticsSchema = new mongoose.Schema({
   },
   scan_time: {
     type: Date,
-    default: Date.now, 
+    default: Date.now,
   },
   device_type: {
     type: String,
-    enum: ['Mobile', 'Desktop'],
     required: true,
   },
   ip_address: {
     type: String,
-    required: true, 
+    required: true,
   },
   location: {
-    country: {
-      type: String,
-      default: 'Unknown',
-    },
-    city: {
-      type: String,
-      default: 'Unknown', 
-    },
+    country: String,
+    city: String,
+    region: String,
+    latitude: String,
+    longitude: String,
+    timezone: String,
   },
 });
 

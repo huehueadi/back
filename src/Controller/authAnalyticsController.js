@@ -1,5 +1,5 @@
 import axios from 'axios'; // Make sure you have axios imported for HTTP requests
-
+import Analytics from '../Models/AnalyticsModel.js';
 // Replace with your actual IPinfo API token
 const IPINFO_API_TOKEN = 'eb327d51a73b1b';  // e.g., 'eb327d51a73b1b'
 
@@ -31,18 +31,37 @@ export const trackScan = async (req, res) => {
       locationData = await getBrowserLocation();
       console.log('Browser Geolocation:', locationData);  // Log the location
 
-      // If geolocation is available, respond with the latitude and longitude
+      // If geolocation is available, use this data for the response and DB storage
+      const { latitude, longitude } = locationData;
+
+      // Save location in the database
+      const newAnalytics = new Analytics({
+        qrCodeId: req.params.qrCodeId, // assuming qrCodeId comes from the URL params
+        scan_time: new Date(),
+        device_type: req.get('User-Agent').includes('Mobile') ? 'Mobile' : 'Desktop',
+        ip_address: req.ip,
+        location: {
+          latitude,
+          longitude,
+          country: 'Unknown', // Since it's from browser, we don't have country data in browser geolocation
+          city: 'Unknown',    // Same as above
+          region: 'Unknown',  // Same as above
+          timezone: 'Unknown' // Same as above
+        },
+      });
+
+      await newAnalytics.save();
+
       return res.json({
-        latitude: locationData.latitude,
-        longitude: locationData.longitude,
-        message: 'Location fetched using browser geolocation.',
+        latitude,
+        longitude,
+        message: 'Location fetched using browser geolocation and saved in the database.',
       });
     } catch (error) {
       console.log('Browser Geolocation failed or not available:', error);
-      // If browser geolocation fails, proceed with IP-based geolocation
     }
 
-    // If browser geolocation is not available, fallback to IP-based geolocation
+    // If browser geolocation fails, use IP-based geolocation (fallback)
     let ip = req.ip || '';  // Default to req.ip if no header is provided
 
     // If behind a reverse proxy (e.g., Nginx, cloud hosting), use X-Forwarded-For header
@@ -62,7 +81,7 @@ export const trackScan = async (req, res) => {
     const response = await axios.get(url);
 
     // Destructure the relevant information from the response
-    const { ip: ipAddress, hostname, city, region, country, loc, org, postal, timezone } = response.data;
+    const { ip: ipAddress, hostname, city, region, country, loc, timezone } = response.data;
 
     // If location (latitude, longitude) is available
     if (loc) {
@@ -76,9 +95,25 @@ export const trackScan = async (req, res) => {
       console.log('Country:', country);
       console.log('Latitude:', latitude);
       console.log('Longitude:', longitude);
-      console.log('Organization:', org);
-      console.log('Postal Code:', postal);
       console.log('Timezone:', timezone);
+
+      // Save location in the database
+      const newAnalytics = new Analytics({
+        qrCodeId: req.params.qrCodeId, // assuming qrCodeId comes from the URL params
+        scan_time: new Date(),
+        device_type: req.get('User-Agent').includes('Mobile') ? 'Mobile' : 'Desktop',
+        ip_address: ip,
+        location: {
+          country,
+          city,
+          region,
+          latitude,
+          longitude,
+          timezone,
+        },
+      });
+
+      await newAnalytics.save();
 
       // Send a response to the client with the location data
       return res.json({
@@ -89,13 +124,10 @@ export const trackScan = async (req, res) => {
         country,
         latitude,
         longitude,
-        org,
-        postal,
         timezone,
-        message: 'Location and detailed IP information fetched successfully.',
+        message: 'Location fetched using IP-based geolocation and saved in the database.',
       });
     } else {
-      // Handle case when location is not found
       return res.status(404).json({ message: 'Location not found for the IP address.' });
     }
   } catch (error) {
@@ -114,7 +146,6 @@ export const trackScan = async (req, res) => {
     }
   }
 };
-
 
 export const getAllAnalytics = async(req, res)=>{
     try {
