@@ -295,8 +295,10 @@
 import moment from 'moment-timezone';
 import QRCode from "qrcode";
 import Call from '../Models/CallModel.js';
+import File from '../Models/FileModel.js';
 import Qr from '../Models/QrModel.js';
 import Slot from '../Models/SlotModel.js';
+import Whatsapp from '../Models/SmsModel.js';
 import Vcard from '../Models/V-CardModel.js';
 
 // export const generateQrCode = async (req, res) => {
@@ -400,7 +402,7 @@ export const redirectQrCode = async (req, res) => {
 
     // Check if slot data exists
     if (slotData) {
-      const { startTime, endTime, redirectionUrl, landing_page, v_card, call } = slotData;
+      const { startTime, endTime, redirectionUrl, landing_page, v_card, call, whatsapp, file_upload } = slotData;
 
       // Convert Slot Start and End Times from UTC to IST
       const slotStartTime = moment.utc(startTime).tz('Asia/Kolkata');
@@ -456,7 +458,39 @@ export const redirectQrCode = async (req, res) => {
           });
         }
       }
+    
+    else if(whatsapp){
+      const whatsappExist = await Whatsapp.findById(whatsapp)
+      if(whatsappExist){
+        const whatsappLink = whatsappExist.whatsapp_link
+
+       return res.send(whatsappLink)
+      }
+      else{
+        console.log("link not found")
+        return res.status(400).json({
+          message: "vCard not found in the database."
+        });
+      }
     }
+    
+  else if(file_upload){
+    const fileExists = await File.findById(file_upload)
+    if(fileExists){
+      const fileLink = fileExists.file
+
+      return res.redirect(fileLink)
+    }
+    else{
+      console.log("link not found")
+      return res.status(400).json({
+        message: "vCard not found in the database."
+      });
+    }
+    
+  }
+}
+
 
        else {
         console.log("Current time is outside the valid slot time window.");

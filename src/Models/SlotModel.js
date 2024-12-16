@@ -94,9 +94,9 @@ const slotSchema = new mongoose.Schema({
     required:false
    
   },
-  sms: {
+  whatsapp: {
    type:mongoose.Schema.Types.ObjectId,
-   ref:"Sms",
+   ref:"Whatsapp",
    required:false
   },
   call: {

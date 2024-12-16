@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
 
-const smsSchema = new mongoose.Schema({
+const whatsappSchema = new mongoose.Schema({
     recipient_number: { 
         type: String,
         required:true 
@@ -9,9 +9,13 @@ const smsSchema = new mongoose.Schema({
         type: String,
         required:true
     },
+    whatsapp_link:{
+        type:String,
+        required:true
+    }
 
 })
 
-const Sms = mongoose.model("Sms", smsSchema)
+const Whatsapp = mongoose.model("Whatsapp", whatsappSchema)
 
-export default Sms
+export default Whatsapp
