@@ -449,7 +449,7 @@ export const redirectQrCode = async (req, res) => {
         if(numberExist){
           const callUrl = `tel:${numberExist.phone_number}`
          
-          res.send(callUrl)
+          res.redirect(callUrl)
         }
         else {
           // If vCard is not found in the database
@@ -465,7 +465,7 @@ export const redirectQrCode = async (req, res) => {
       if(whatsappExist){
         const whatsappLink = whatsappExist.whatsapp_link
 
-       return res.send(whatsappLink)
+       return res.redirect(whatsappLink)
       }
       else{
         console.log("link not found")
