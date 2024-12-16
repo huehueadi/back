@@ -296,6 +296,7 @@ import moment from 'moment-timezone';
 import QRCode from "qrcode";
 import Call from '../Models/CallModel.js';
 import File from '../Models/FileModel.js';
+import Page1 from '../Models/Page1Model.js';
 import Qr from '../Models/QrModel.js';
 import Slot from '../Models/SlotModel.js';
 import Whatsapp from '../Models/SmsModel.js';

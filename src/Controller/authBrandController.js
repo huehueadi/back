@@ -83,7 +83,7 @@ export const getallBrands = async(req, res)=>{
             getall
         })
     } catch (error) {
-        res.status(500).json({
+        return res.status(500).json({
             message:"Internal server error",
             success:false
         })
