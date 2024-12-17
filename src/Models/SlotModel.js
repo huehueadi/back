@@ -80,8 +80,7 @@ const slotSchema = new mongoose.Schema({
     unique: true,
   },
   redirectionUrl: {
-    type: mongoose.Schema.Types.String,
-    ref:"Redirect",
+    type: String,
     required: false,
   },
   landing_page: {

@@ -1,7 +1,6 @@
 import moment from 'moment';
 import vCardsJs from 'vcards-js';
 import Call from '../Models/CallModel.js';
-import Redirect from '../Models/RedirectionUrl.js';
 import Slot from "../Models/SlotModel.js";
 import Whatsapp from '../Models/SmsModel.js';
 import Vcard from '../Models/V-CardModel.js';
@@ -30,8 +29,7 @@ export const createSlot = async (req, res) => {
     const startTimeUTC = moment.tz(startTime, 'Asia/Kolkata').utc().toISOString(); 
     const endTimeUTC = moment.tz(endTime, 'Asia/Kolkata').utc().toISOString();
 
-    const relatedDocuments = await createRelatedDocuments({ v_card, whatsapp, call, redirectionUrl, req });
-
+    const relatedDocuments = (v_card || whatsapp || call) ? await createRelatedDocuments({ v_card, whatsapp, call, req }) : {};
     const newSlot = new Slot({
       qrCodeId,
       brand_id,
@@ -58,7 +56,7 @@ export const createSlot = async (req, res) => {
   }
 };
 
-const createRelatedDocuments = async ({ v_card, whatsapp, call, redirectionUrl,req }) => {
+const createRelatedDocuments = async ({ v_card, whatsapp, call, req }) => {
   const documents = {};
 
   if (v_card) {
@@ -135,19 +133,8 @@ console.log("vcarddata", generatedVCardData)
     const newCall = new Call({ phone_number });
     const savedCall = await newCall.save();
     documents.call = savedCall;
-  } 
-    else if(redirectionUrl){
-      const {redirection_url} = req.body
-
-      const newUrl = new Redirect({
-        redirection_url,
-      })
-      const savedUrl = await newUrl.save()
-      documents.redirectionUrl = savedUrl;
-
-
-    }
-  else {
+  } else {
+    // If none of the conditions are met, you can throw an error or handle it differently
     throw new Error('No valid type found in the request body (v_card, whatsapp, or call).');
   }
 
