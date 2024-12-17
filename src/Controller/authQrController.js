@@ -298,6 +298,7 @@ import Call from '../Models/CallModel.js';
 import Page1 from '../Models/Page1Model.js';
 import Qr from '../Models/QrModel.js';
 import Slot from '../Models/SlotModel.js';
+import Whatsapp from '../Models/SmsModel.js';
 import Vcard from '../Models/V-CardModel.js';
 
 // export const generateQrCode = async (req, res) => {
@@ -401,7 +402,7 @@ export const redirectQrCode = async (req, res) => {
 
     // Check if slot data exists
     if (slotData) {
-      const { startTime, endTime, redirectionUrl, landing_page, v_card, call } = slotData;
+      const { startTime, endTime, redirectionUrl, landing_page, v_card, call, whatsapp } = slotData;
  
       // Convert Slot Start and End Times from UTC to IST
       const slotStartTime = moment.utc(startTime).tz('Asia/Kolkata');
@@ -459,6 +460,20 @@ export const redirectQrCode = async (req, res) => {
           });
         }
       }
+      else if(whatsapp){
+        const whatsappExist = await Whatsapp.findById(whatsapp)
+        if(whatsappExist){
+          const whatsappLink = whatsappExist.whatsapp_link
+   
+         return res.redirect(whatsappLink)
+        }
+        else{
+          console.log("link not found")
+          return res.status(400).json({
+            message: "vCard not found in the database."
+          });
+        }
+      }
     }
  
        else {
@@ -474,7 +489,7 @@ export const redirectQrCode = async (req, res) => {
     }
 
     // Perform the redirection
-    res.redirect(redirectUrl);
+    return res.redirect(redirectUrl);
 
   } catch (err) {
     console.error('Error during redirection:', err);
