@@ -273,3 +273,24 @@ export const getAllAnalyticsData = async(req, res)=>{
 };
 
 
+export const gettotal = async (req, res) => {
+  try {
+    // Calculate total scans (count of all IpLocation docs in the collection)
+    const totalScans = await IpLocation.countDocuments();
+
+    // Calculate unique scans (unique IPs that have scanned)
+    const uniqueScans = await IpLocation.aggregate([
+      { $group: { _id: "$ip" } },  // Group by IP address to get unique IPs
+      { $count: "uniqueScans" }    // Count the number of unique IPs
+    ]);
+
+    // Return both total and unique scan counts as a response
+    res.json({
+      totalScans,
+      uniqueScans: uniqueScans.length > 0 ? uniqueScans[0].uniqueScans : 0
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error fetching scan stats' });
+  }
+};

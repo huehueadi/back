@@ -23,13 +23,6 @@ try {
     slug: name,
     content: [  
     { contentType: "text", contentData: "Welcome to the default flowpage!" },
-    { contentType: "text", contentData: "This is the fallback content for unknown flowpages." },
-    { contentType: "text", contentData: "This is the fallback content for unknown flowpages." },
-    { contentType: "text", contentData: "This is the fallback content for unknown flowpages." },
-    { contentType: "text", contentData: "This is the fallback content for unknown flowpages." },
-    { contentType: "text", contentData: "This is the fallback content for unknown flowpages." },
-    { contentType: "link", contentData: "https://default-link.com" },
-    { contentType: "image", contentData: "//via.placeholder.com/300" }
     ]
   };
  

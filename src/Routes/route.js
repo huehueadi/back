@@ -1,5 +1,5 @@
 import express from 'express'
-import { getAllAnalyticsData, trackScan } from '../Controller/authAnalyticsController.js'
+import { getAllAnalyticsData, gettotal, trackScan } from '../Controller/authAnalyticsController.js'
 import { createBrand, getBrand, getallBrands, updateBrand } from '../Controller/authBrandController.js'
 import { getdefaultTemplate } from '../Controller/authGetdefaultPageController.js'
 import { createPage, getPage } from '../Controller/authPageController.js'
@@ -46,6 +46,8 @@ router.get('/getall', getAlluploaded)
 router.post('/page1/:templateId', createPage1)
 router.get('/redirect/getpage1/:slug', getapge1)
 router.get('/getapge1-all', getAllPage)
+
+router.get('/getscans', gettotal)
 
 
 // router.get('/getdata', getAllAnalyticsData)
