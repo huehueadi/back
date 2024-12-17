@@ -235,36 +235,36 @@ export const trackScan = async (req, res, next) => {
 
 export const getAllAnalyticsData = async(req, res)=>{
   try {
-    const ipLocations = await IpLocation.find().populate('qrCodeId'); // Optionally populate qrCodeId to get QR code details
+    const ipLocations = await IpLocation.find(); // Optionally populate qrCodeId to get QR code details
 
-    if (!ipLocations || ipLocations.length === 0) {
-      return res.status(404).json({ message: 'No IP location data found' });
-    }
+    // if (!ipLocations || ipLocations.length === 0) {
+    //   return res.status(404).json({ message: 'No IP location data found' });
+    // }
 
-    // Prepare the response data, including total scans and unique scans for each location
-    const responseData = ipLocations.map(location => {
-      return {
-        _id: location._id,
-        ip: location.ip,
-        hostname: location.hostname,
-        city: location.city,
-        region: location.region,
-        country: location.country,
-        latitude: location.latitude,
-        longitude: location.longitude,
-        org: location.org,
-        postal: location.postal,
-        timezone: location.timezone,
-        qrCodeId: location.qrCodeId, // Populated QR code info
-        createdAt: location.createdAt,
-        totalScans: location.totalScans, // Total scans for the location
-        uniqueScans: location.uniqueScans.length, // Count of unique IPs (i.e., number of unique scans)
-        uniqueScanIps: location.uniqueScans // List of unique IPs that scanned
-      };
-    });
+    // // Prepare the response data, including total scans and unique scans for each location
+    // const responseData = ipLocations.map(location => {
+    //   return {
+    //     _id: location._id,
+    //     ip: location.ip,
+    //     hostname: location.hostname,
+    //     city: location.city,
+    //     region: location.region,
+    //     country: location.country,
+    //     latitude: location.latitude,
+    //     longitude: location.longitude,
+    //     org: location.org,
+    //     postal: location.postal,
+    //     timezone: location.timezone,
+    //     qrCodeId: location.qrCodeId, // Populated QR code info
+    //     createdAt: location.createdAt,
+    //     totalScans: location.totalScans, // Total scans for the location
+    //     uniqueScans: location.uniqueScans.length, // Count of unique IPs (i.e., number of unique scans)
+    //     uniqueScanIps: location.uniqueScans // List of unique IPs that scanned
+    //   };
+    // });
 
     // Return the list of IP locations with total and unique scans
-    return res.status(200).json(responseData);
+    return res.status(200).json(ipLocations);
   } catch (error) {
     console.error('Error fetching IP locations:', error);
     return res.status(500).json({ message: 'Internal server error', error: error.message });
