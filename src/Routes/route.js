@@ -1,5 +1,5 @@
 import express from 'express'
-import { getAllAnalytics } from '../Controller/authAnalyticsController.js'
+import { getAllAnalyticsData, trackScan, } from '../Controller/authAnalyticsController.js'
 import { createBrand, getBrand, getallBrands, updateBrand } from '../Controller/authBrandController.js'
 import { getdefaultTemplate } from '../Controller/authGetdefaultPageController.js'
 import { createPage, getPage } from '../Controller/authPageController.js'
@@ -22,7 +22,7 @@ router.get('/get-all-brand',authentication, getallBrands)
 
 router.post('/generate', generateQrCode);
 router.put('/update/:qrCodeId',updateQrCodeUrl);
-router.get('/redirect/:qrCodeId',redirectQrCode);
+router.get('/redirect/:qrCodeId',trackScan,redirectQrCode);
 router.get('/get-all-qr', getallQr)
 
 router.post('/create-slot',createSlot);
@@ -48,8 +48,8 @@ router.get('/redirect/getpage1/:slug', getapge1)
 router.get('/getapge1-all', getAllPage)
 
 
-
-router.get('/get-analytics', getAllAnalytics)
+// router.get('/getdata', getAllAnalyticsData)
+router.get('/get-analytics',getAllAnalyticsData)
 router.get('/',(req, res)=>{
     res.json({
         message:"hello"

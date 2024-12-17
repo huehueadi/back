@@ -84,8 +84,7 @@ const slotSchema = new mongoose.Schema({
     required: false,
   },
   landing_page: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Page1",
+    type: String,
     required: false,
   },
   v_card: {

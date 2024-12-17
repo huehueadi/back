@@ -1,24 +1,24 @@
 import { promises as fs } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-
+ 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
+ 
 const viewsFolderPath = path.join(__dirname, '..', 'views');
 export const getdefaultTemplate = async (req, res) => {
- try {
-  const { name } = req.params; 
-
+try {
+  const { name } = req.params;
+ 
   const templatePath = path.join(viewsFolderPath, `${name}.ejs`);
-
+ 
   const fileExists = await fs
     .access(templatePath)
-    .then(() => true) 
+    .then(() => true)
     .catch(() => false);  
  
   
-  const flowpage = {
+  const page = {
     title: name,
     slug: name,
     content: [  
@@ -32,12 +32,12 @@ export const getdefaultTemplate = async (req, res) => {
     { contentType: "image", contentData: "//via.placeholder.com/300" }
     ]
   };
-
-  return res.render(name, { flowpage }); 
- } catch (error) {
+ 
+  return res.render(name, { page });
+} catch (error) {
      res.status(500).json({
       message:"Internal server error",
       success:false
      })
- }
+}
 };

@@ -295,11 +295,9 @@
 import moment from 'moment-timezone';
 import QRCode from "qrcode";
 import Call from '../Models/CallModel.js';
-import File from '../Models/FileModel.js';
 import Page1 from '../Models/Page1Model.js';
 import Qr from '../Models/QrModel.js';
 import Slot from '../Models/SlotModel.js';
-import Whatsapp from '../Models/SmsModel.js';
 import Vcard from '../Models/V-CardModel.js';
 
 // export const generateQrCode = async (req, res) => {
@@ -403,33 +401,35 @@ export const redirectQrCode = async (req, res) => {
 
     // Check if slot data exists
     if (slotData) {
-      const { startTime, endTime, redirectionUrl, landing_page, v_card, call, whatsapp, file_upload } = slotData;
-
+      const { startTime, endTime, redirectionUrl, landing_page, v_card, call } = slotData;
+ 
       // Convert Slot Start and End Times from UTC to IST
       const slotStartTime = moment.utc(startTime).tz('Asia/Kolkata');
       const slotEndTime = moment.utc(endTime).tz('Asia/Kolkata');
       console.log("Slot Start Time (IST):", slotStartTime.format('YYYY-MM-DD HH:mm:ss'));
       console.log("Slot End Time (IST):", slotEndTime.format('YYYY-MM-DD HH:mm:ss'));
-
+ 
       if (currentTime.isBetween(slotStartTime, slotEndTime, null, '[]')) {
         // If current time is within the slot time range, handle different scenarios:
         if (landing_page) {
           const landingPage = await Page1.findOne({ slug: landing_page });
-
+ 
           if (landingPage) {
             console.log("Landing Page found:", landingPage);
-            return res.redirect(`/getpage1/${landingPage.slug}`);
+            
+            return res.redirect(`getpage1/${landingPage.slug}`);
+          
           } else {
             console.log("Landing page not found.");
             return res.status(404).json({ message: 'Landing page not found.' });
           }
         } else if (redirectionUrl) {
-          redirectUrl = redirectionUrl;  
+          redirectUrl = redirectionUrl;  // Use the provided redirection URL if available
         }
       // If v_card exists, handle the vCard download
       else if (v_card) {
         const vcardExist = await Vcard.findOne({ _id: v_card });
-
+ 
         if (vcardExist) {
           // Set the headers for the vCard download
           res.setHeader('Content-Type', 'text/vcard');
@@ -449,7 +449,7 @@ export const redirectQrCode = async (req, res) => {
         if(numberExist){
           const callUrl = `tel:${numberExist.phone_number}`
          
-          res.redirect(callUrl)
+          res.send(callUrl)
         }
         else {
           // If vCard is not found in the database
@@ -459,40 +459,8 @@ export const redirectQrCode = async (req, res) => {
           });
         }
       }
-    
-    else if(whatsapp){
-      const whatsappExist = await Whatsapp.findById(whatsapp)
-      if(whatsappExist){
-        const whatsappLink = whatsappExist.whatsapp_link
-
-       return res.redirect(whatsappLink)
-      }
-      else{
-        console.log("link not found")
-        return res.status(400).json({
-          message: "vCard not found in the database."
-        });
-      }
     }
-    
-  else if(file_upload){
-    const fileExists = await File.findById(file_upload)
-    if(fileExists){
-      const fileLink = fileExists.file
-
-      return res.redirect(fileLink)
-    }
-    else{
-      console.log("link not found")
-      return res.status(400).json({
-        message: "vCard not found in the database."
-      });
-    }
-    
-  }
-}
-
-
+ 
        else {
         console.log("Current time is outside the valid slot time window.");
       }

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+ 
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= page.pageTitle %></title>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <!-- Tailwind CSS CDN (for utility classes) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+ 
+  <style>
+    /* Base styles */
+    body {
+      font-family: 'Open Sans', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f7f7f7; /* Soft light gray background */
+      color: #333; /* Dark gray text for readability */
+      line-height: 1.7;
+    }
+ 
+    /* Enhanced Heading Style */
+    .heading-style {
+      font-size: 2.5rem; /* Moderate text size */
+      font-weight: 600; /* Slightly bold weight */
+      background-color: rgba(255, 255, 255, 0.85); /* Light background for contrast */
+      padding: 15px 30px; /* Padding around the text */
+      border-radius: 10px; /* Rounded corners for a soft look */
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Subtle shadow */
+      text-align: center; /* Centered text */
+      margin-bottom: 20px; /* Space below the heading */
+    }
+ 
+    /* Gradient text effect */
+    .gradient-text {
+      background: linear-gradient(to right, #6a11cb, #2575fc); /* Soft purple-blue gradient */
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+ 
+    /* Button hover effect */
+    .hover-btn:hover {
+      background-color: #74c0fc; /* Light blue */
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      transition: 0.3s ease-in-out;
+    }
+ 
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px;
+    }
+ 
+    /* Section and Heading styles */
+    h2 {
+      font-size: 2rem;
+      font-weight: 500;
+      color: #4a4a4a; /* Soft dark gray */
+      margin-bottom: 20px;
+    }
+ 
+    /* Styling for Image Section */
+    .image-section img {
+      max-width: 100%;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    }
+ 
+    .text-section,
+    .image-section,
+    .link-section,
+    .contact-form-section {
+      margin-bottom: 50px;
+    }
+ 
+    /* Contact form */
+    .contact-form-section form {
+      background-color: #ffffff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+ 
+    .contact-form-section input,
+    .contact-form-section textarea {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 20px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: border-color 0.3s ease;
+    }
+ 
+    .contact-form-section input:focus,
+    .contact-form-section textarea:focus {
+      border-color: #74c0fc;
+      outline: none;
+    }
+ 
+    .contact-form-section button {
+      background-color: #6a11cb; /* Purple */
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      border: none;
+      transition: background-color 0.3s ease;
+    }
+ 
+    .contact-form-section button:hover {
+      background-color: #2575fc; /* Blue */
+    }
+ 
+    /* Responsive design */
+    @media (max-width: 768px) {
+      .container {
+        padding: 20px;
+      }
+ 
+      h2 {
+        font-size: 1.8rem;
+      }
+    }
+ 
+  </style>
+</head>
+ 
+<body>
+  <div class="container">
+    <% page.content.forEach((section) => { %> <!-- Loop through content sections -->
+      <% if (section.type === 'text') { %>
+        <section class="text-section">
+          <h2 class="heading-style gradient-text mb-4"><%= section.data.heading %></h2> <!-- Enhanced Heading with gradient -->
+          <p class="text-lg text-gray-700"><%= section.data.description %></p>
+        </section>
+      <% } else if (section.type === 'image') { %>
+        <section class="image-section">
+          <h2 class="gradient-text mb-4"><%= section.data.imageDescription %></h2> <!-- Image section with gradient heading -->
+          <img src="<%= section.data.imageUrl %>" alt="<%= section.data.imageDescription %>" />
+        </section>
+      <% } else if (section.type === 'link') { %>
+        <section class="link-section">
+          <h2 class="gradient-text mb-4">Check out this link</h2>
+          <a href="<%= section.data.linkUrl %>" class="hover-btn inline-block text-white py-3 px-6 rounded-lg text-center">
+            <%= section.data.linkDescription %>
+          </a>
+        </section>
+      <% } else if (section.type === 'video') { %>
+        <section class="video-section">
+          <h2 class="gradient-text mb-4"><%= section.data.videoDescription %></h2> <!-- Video section with gradient heading -->
+          <iframe class="w-full h-64 rounded-lg shadow-lg" src="<%= section.data.videoUrl %>" title="<%= section.data.videoDescription %>"></iframe>
+        </section>
+      <% } else if (section.type === 'contactForm') { %>
+        <section class="contact-form-section">
+          <h2 class="gradient-text mb-4">Contact Us</h2>
+          <form>
+            <% section.data.formFields.forEach((field) => { %> <!-- Loop through form fields -->
+              <% if (field.fieldType === 'text' || field.fieldType === 'email') { %>
+                <input type="<%= field.fieldType %>" name="<%= field.name %>" placeholder="<%= field.placeholder %>" class="mb-4" required="<%= field.required %>" />
+              <% } else if (field.fieldType === 'textarea') { %>
+                <textarea name="<%= field.name %>" placeholder="<%= field.placeholder %>" class="mb-4" rows="5" required="<%= field.required %>"></textarea>
+              <% } %>
+            <% }) %>
+            <button type="submit">Submit</button>
+          </form>
+        </section>
+      <% } %>
+    <% }) %> <!-- End content loop -->
+  </div>
+</body>
+ 
+</html>

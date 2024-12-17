@@ -151,24 +151,27 @@
 //   }
 // };
 
-import axios from 'axios'; // Make sure you have axios imported for HTTP requests
+import axios from 'axios';
+import IpLocation from '../Models/AnalyticsModel.js';
+import Qr from '../Models/QrModel.js'; // Assuming Qr is a model for QR codes
+const IPINFO_API_TOKEN = 'eb327d51a73b1b';  // Your IPInfo API token
 
-const IPINFO_API_TOKEN = 'eb327d51a73b1b';  // e.g., 'eb327d51a73b1b'
- 
-export const trackScan = async (req, res) => {
+export const trackScan = async (req, res, next) => {
   try {
+    // Step 1: Fetch and validate IP address from the request
     let ip = req.ip || ''; 
 
     if (req.headers['x-forwarded-for']) {
       ip = req.headers['x-forwarded-for'].split(',')[0].trim();
     }
 
+    // Validate IP (ignore localhost addresses)
     if (!ip || ip === '::1' || ip === '127.0.0.1') {
-      return res.status(400).json({ message: 'Invalid IP address' });
+      return next(); // IP is invalid or localhost, skip tracking
     }
 
+    // Step 2: Fetch IP location data from IPInfo API
     const url = `https://ipinfo.io/${ip}/json?token=${IPINFO_API_TOKEN}`;
-
     const response = await axios.get(url);
 
     const { ip: ipAddress, hostname, city, region, country, loc, org, postal, timezone } = response.data;
@@ -176,19 +179,21 @@ export const trackScan = async (req, res) => {
     if (loc) {
       const [latitude, longitude] = loc.split(',');
 
-      console.log('IP Address:', ipAddress);
-      console.log('Hostname:', hostname);
-      console.log('City:', city);
-      console.log('Region:', region);
-      console.log('Country:', country);
-      console.log('Latitude:', latitude);
-      console.log('Longitude:', longitude);
-      console.log('Organization:', org);
-      console.log('Postal Code:', postal);
-      console.log('Timezone:', timezone);
+      // Step 3: Handle the `qrCodeId` parameter in the request
+      const { qrCodeId } = req.params; 
+      let qrCodeData = null;
 
-      // Send a response to the client with the location data
-      return res.json({
+      // Check if qrCodeId exists in the request params
+      if (qrCodeId) {
+        qrCodeData = await Qr.findOne({ qrCodeId });
+
+        if (!qrCodeData) {
+          return res.status(404).json({ message: 'QR code not found' });
+        }
+      }
+
+      // Step 4: Save IP location data into the database
+      const newIpLocation = new IpLocation({
         ip: ipAddress,
         hostname,
         city,
@@ -199,39 +204,71 @@ export const trackScan = async (req, res) => {
         org,
         postal,
         timezone,
-        message: 'Location and detailed IP information fetched successfully.',
+        qrCodeId: qrCodeData ? qrCodeData._id : null, // Store the qrCodeId if it exists
       });
-    } else {
-      return res.status(404).json({ message: 'Location not found for the IP address.' });
+
+      await newIpLocation.save();
+      console.log('IP location data saved successfully');
+
+      // Step 5: Update unique and total scan counts
+      if (qrCodeData) {
+        // Fetch the existing IP location document for the QR code
+        const existingIpLocation = await IpLocation.findOne({ qrCodeId: qrCodeData._id });
+
+        if (existingIpLocation) {
+          // Call the trackScan method to update the total scans and unique scans
+          await existingIpLocation.trackScan(ip);
+        }
+      }
+
     }
+
+    // Step 6: Pass control to the next middleware or route handler
+    next();
+
   } catch (error) {
     console.error('Error fetching IP location:', error);
-
-    if (error.response) {
-      return res.status(error.response.status).json({ message: error.response.data });
-    } else if (error.request) {
-      return res.status(500).json({ message: 'No response received from IPinfo API.' });
-    } else {
-      return res.status(500).json({ message: 'Error fetching IP location' });
-    }
+    next(error); // Pass error to next error handler
   }
 };
 
 
-export const getAllAnalytics = async(req, res)=>{
-    try {
-        const getAnalytics = await Analytics.find()
+export const getAllAnalyticsData = async(req, res)=>{
+  try {
+    const ipLocations = await IpLocation.find().populate('qrCodeId'); // Optionally populate qrCodeId to get QR code details
 
-        res.status(200).json({
-            message:"fetched",
-            sucess:true,
-            getAnalytics
-        })
-    } catch (error) {
-        res.status(500).json({
-            message:"fetched",
-            sucess:false,
-           
-        })
+    if (!ipLocations || ipLocations.length === 0) {
+      return res.status(404).json({ message: 'No IP location data found' });
     }
-}
+
+    // Prepare the response data, including total scans and unique scans for each location
+    const responseData = ipLocations.map(location => {
+      return {
+        _id: location._id,
+        ip: location.ip,
+        hostname: location.hostname,
+        city: location.city,
+        region: location.region,
+        country: location.country,
+        latitude: location.latitude,
+        longitude: location.longitude,
+        org: location.org,
+        postal: location.postal,
+        timezone: location.timezone,
+        qrCodeId: location.qrCodeId, // Populated QR code info
+        createdAt: location.createdAt,
+        totalScans: location.totalScans, // Total scans for the location
+        uniqueScans: location.uniqueScans.length, // Count of unique IPs (i.e., number of unique scans)
+        uniqueScanIps: location.uniqueScans // List of unique IPs that scanned
+      };
+    });
+
+    // Return the list of IP locations with total and unique scans
+    return res.status(200).json(responseData);
+  } catch (error) {
+    console.error('Error fetching IP locations:', error);
+    return res.status(500).json({ message: 'Internal server error', error: error.message });
+  }
+};
+
+

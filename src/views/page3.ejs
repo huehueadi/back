@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+ 
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= page.pageTitle %></title>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <!-- Tailwind CSS CDN (for utility classes) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+ 
+  <style>
+    body {
+      font-family: 'Open Sans', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #FAD02E 0%, #F28D35 100%);
+      color: #333;
+      line-height: 1.6;
+    }
+ 
+    .fade-in {
+      animation: fadeIn 2s ease-in-out;
+    }
+ 
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+ 
+      to {
+        opacity: 1;
+      }
+    }
+ 
+    .slide-in {
+      animation: slideIn 1.5s ease-in-out;
+    }
+ 
+    @keyframes slideIn {
+      from {
+        transform: translateX(-100%);
+      }
+ 
+      to {
+        transform: translateX(0);
+      }
+    }
+ 
+    .bounce-in {
+      animation: bounceIn 1.5s ease-in-out;
+    }
+ 
+    @keyframes bounceIn {
+      0% {
+        transform: scale(0.5);
+      }
+ 
+      50% {
+        transform: scale(1.1);
+      }
+ 
+      100% {
+        transform: scale(1);
+      }
+    }
+ 
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px;
+    }
+ 
+    h2 {
+      font-size: 2rem;
+      font-weight: 600;
+      color: #2d2d2d;
+      margin-bottom: 20px;
+    }
+ 
+    .text-section,
+    .image-section,
+    .link-section,
+    .video-section,
+    .contact-form-section {
+      margin-bottom: 40px;
+    }
+ 
+    /* Styling for image section */
+    .image-section img {
+      max-width: 100%;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+ 
+    /* Link section styles */
+    .link-section a {
+      display: inline-block;
+      background-color: #F28D35;
+      color: #fff;
+      padding: 12px 20px;
+      text-decoration: none;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      transition: background-color 0.3s ease;
+    }
+ 
+    .link-section a:hover {
+      background-color: #D46B2C;
+    }
+ 
+    /* Contact form section styles */
+    .contact-form-section form {
+      background-color: #fff;
+      padding: 40px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+ 
+    .contact-form-section input,
+    .contact-form-section textarea {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 20px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: border-color 0.3s ease;
+    }
+ 
+    .contact-form-section input:focus,
+    .contact-form-section textarea:focus {
+      border-color: #F28D35;
+      outline: none;
+    }
+ 
+    .contact-form-section button {
+      background-color: #F28D35;
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      border: none;
+      transition: background-color 0.3s ease;
+    }
+ 
+    .contact-form-section button:hover {
+      background-color: #D46B2C;
+    }
+ 
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .container {
+        padding: 20px;
+      }
+ 
+      h2 {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+ 
+<body>
+  <div class="container">
+    <% page.content.forEach((section) => { %> <!-- Loop through content sections -->
+      <% if (section.type === 'text') { %>
+        <section class="text-section fade-in">
+          <h2 class="text-3xl font-semibold mb-4"><%= section.data.heading %></h2> <!-- Text section -->
+          <p class="text-lg text-gray-700"><%= section.data.description %></p>
+        </section>
+      <% } else if (section.type === 'image') { %>
+        <section class="image-section slide-in">
+          <h2 class="text-3xl font-semibold mb-4"><%= section.data.imageDescription %></h2> <!-- Image section -->
+          <img src="<%= section.data.imageUrl %>" alt="<%= section.data.imageDescription %>" />
+        </section>
+      <% } else if (section.type === 'link') { %>
+        <section class="link-section bounce-in">
+          <h2 class="text-3xl font-semibold mb-4">Link Section</h2> <!-- Link section -->
+          <a href="<%= section.data.linkUrl %>" class="block text-center">
+            <%= section.data.linkDescription %>
+          </a>
+        </section>
+      <% } else if (section.type === 'video') { %>
+        <section class="video-section fade-in">
+          <h2 class="text-3xl font-semibold mb-4"><%= section.data.videoDescription %></h2> <!-- Video section -->
+          <iframe class="w-full h-64 rounded shadow-lg" src="<%= section.data.videoUrl %>" title="<%= section.data.videoDescription %>"></iframe>
+        </section>
+      <% } else if (section.type === 'contactForm') { %>
+        <section class="contact-form-section slide-in">
+          <h2 class="text-3xl font-semibold mb-4">Contact Form</h2> <!-- Contact Form section -->
+          <form>
+            <% section.data.formFields.forEach((field) => { %> <!-- Loop through form fields -->
+              <% if (field.fieldType === 'text' || field.fieldType === 'email') { %>
+                <input type="<%= field.fieldType %>" name="<%= field.name %>" placeholder="<%= field.placeholder %>" class="mb-4" required="<%= field.required %>" />
+              <% } else if (field.fieldType === 'textarea') { %>
+                <textarea name="<%= field.name %>" placeholder="<%= field.placeholder %>" class="mb-4" rows="5" required="<%= field.required %>"></textarea>
+              <% } %>
+            <% }) %>
+            <button type="submit" class="w-full">Submit</button>
+          </form>
+        </section>
+      <% } %>
+    <% }) %> <!-- End content loop -->
+  </div>
+</body>
+ 
+</html>
+ 
