@@ -1,5 +1,5 @@
 import express from 'express'
-import { getAllAnalyticsData, trackScan, } from '../Controller/authAnalyticsController.js'
+import { getAllAnalyticsData, trackScan } from '../Controller/authAnalyticsController.js'
 import { createBrand, getBrand, getallBrands, updateBrand } from '../Controller/authBrandController.js'
 import { getdefaultTemplate } from '../Controller/authGetdefaultPageController.js'
 import { createPage, getPage } from '../Controller/authPageController.js'

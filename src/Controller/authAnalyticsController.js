@@ -228,8 +228,9 @@ export const trackScan = async (req, res, next) => {
 
   } catch (error) {
     console.error('Error fetching IP location:', error);
-    next(error); // Pass error to next error handler
+   ; // Pass error to next error handler
   }
+  next()
 };
 
 

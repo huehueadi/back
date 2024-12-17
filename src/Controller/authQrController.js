@@ -478,7 +478,7 @@ export const redirectQrCode = async (req, res) => {
 
   } catch (err) {
     console.error('Error during redirection:', err);
-    res.status(500).json({ message: 'Error processing redirection.' });
+   return res.status(500).json({ message: 'Error processing redirection.' });
   }
 };
 

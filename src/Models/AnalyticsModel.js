@@ -22,8 +22,8 @@ ipLocationSchema.methods.trackScan = async function (ip) {
   // Increment total scans count
   this.totalScans += 1;
 
-  // Increment unique scans count if the scan is from a new IP
-  if (this.uniqueScansCount === 0 || !this.uniqueScans.includes(ip)) {
+  // Check if this scan is unique (we only increment uniqueScansCount when we encounter a new IP)
+  if (this.uniqueScansCount === 0 || !this.uniqueScansCount.includes(ip)) {
     this.uniqueScansCount += 1;
   }
 
@@ -34,5 +34,6 @@ ipLocationSchema.methods.trackScan = async function (ip) {
 const IpLocation = mongoose.model('IpLocation', ipLocationSchema);
 
 export default IpLocation;
+
 
 
