@@ -298,6 +298,7 @@ import Call from '../Models/CallModel.js';
 import File from '../Models/FileModel.js';
 import Page1 from '../Models/Page1Model.js';
 import Qr from '../Models/QrModel.js';
+import Redirect from '../Models/RedirectionUrl.js';
 import Slot from '../Models/SlotModel.js';
 import Whatsapp from '../Models/SmsModel.js';
 import Vcard from '../Models/V-CardModel.js';
@@ -423,9 +424,8 @@ export const redirectQrCode = async (req, res) => {
             console.log("Landing page not found.");
             return res.status(404).json({ message: 'Landing page not found.' });
           }
-        } else if (redirectionUrl) {
-          redirectUrl = redirectionUrl;  // Use the provided redirection URL if available
-        }
+        } 
+
       // If v_card exists, handle the vCard download
       else if (v_card) {
         const vcardExist = await Vcard.findOne({ _id: v_card });
@@ -489,6 +489,21 @@ export const redirectQrCode = async (req, res) => {
       });
     }
     
+  }
+  else if(redirectionUrl){
+    const urlExist = await Redirect.findOne(redirectionUrl)
+    if(urlExist){
+      const url = urlExist.redirection_url
+
+      return res.redirect(url)
+      
+    }
+    else{
+      console.log("link not found")
+      return res.status(400).json({
+        message: "vCard not found in the database."
+      });
+    }
   }
 }
 
